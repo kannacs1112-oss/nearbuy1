@@ -1,0 +1,44 @@
+{% extends "base.html" %}{% block title %}{{ _("Discover local shops") }}{% endblock %}{% block content %}
+<section class="hero">
+  <div class="hero-copy"><div class="eyebrow"><span class="pulse"></span> {{ _("THE HYPERLOCAL MARKETPLACE") }}</div>
+    <h1>{{ _("Your city.") }}<br><span>{{ _("Every shop.") }}</span><br>{{ _("One place.") }}</h1>
+    <p>{{ _("Discover neighbourhood businesses, compare products and get local essentials delivered to your door.") }}</p>
+    <form class="search-panel" action="{{ url_for('index') }}" method="get"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>{{ _("YOUR CITY") }}</label><div class="search-row"><span>⌖</span><input name="city" value="{{ city }}" placeholder="{{ _('Enter your city') }}"><button class="btn primary">{{ _("Explore") }}</button></div>
+      <div class="search-hint">{{ _("Currently exploring") }} <strong>{{ city }}</strong></div>
+    </form>
+    <div class="hero-stats"><div><strong>{{ shops|length }}+</strong><span>{{ _("local shops") }}</span></div><div><strong>{{ categories|length }}</strong><span>{{ _("categories") }}</span></div><div><strong>{{ countries|length }}</strong><span>{{ _("countries supported") }}</span></div></div>
+  </div>
+  <div class="hero-art"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="glow"></div>
+    <div class="floating-card card-top"><span>🛍️</span><div><b>{{ _("Local finds") }}</b><small>{{ _("All around you") }}</small></div><i>↗</i></div>
+    <div class="market-core"><div class="core-icon">N</div><b>NEARBUY</b><small>{{ _("Made for your neighbourhood") }}</small></div>
+    <div class="floating-card card-bottom"><span>🚴</span><div><b>{{ _("On its way") }}</b><small>{{ _("Local delivery network") }}</small></div><i class="green-dot"></i></div>
+    <div class="mini-tag tag-left">✦ {{ _("Shop local") }}</div><div class="mini-tag tag-right">⌖ {{ city }}</div>
+  </div>
+</section>
+<section class="commerce-proof section">
+  <div><div class="eyebrow">{{ _("MORE THAN A MARKETPLACE") }}</div><h2>{{ _("Local commerce, with better signals.") }}</h2><p>{{ _("NEARBUY helps customers discover products nearby and gives merchants a clearer view of stock, sales and replenishment needs.") }}</p></div>
+  <div class="commerce-proof-grid"><article><span>⌖</span><b>{{ _("Local discovery") }}</b><small>{{ _("Find nearby shops and their listed products.") }}</small></article><article><span>▦</span><b>{{ _("Visible availability") }}</b><small>{{ _("See current stock reported by participating stores.") }}</small></article><article><span>↗</span><b>{{ _("Retail intelligence") }}</b><small>{{ _("Help merchants turn order history into stock actions.") }}</small></article></div>
+</section>
+<section class="section">
+  <div class="section-head"><div><div class="eyebrow">{{ _("BROWSE YOUR WAY") }}</div><h2>{{ _("Explore categories") }}</h2></div><a href="{{ url_for('shops', city=city) }}">{{ _("All shops") }} ↗</a></div>
+  <div class="category-grid">
+    {% for c, icon in [('Groceries','🥬'),('Furniture','🛋️'),('Meat & Seafood','🥩'),('Electronics','🎧'),('Clothing','👕'),('Hardware','🧰'),('Pharmacy','🩺'),('Stationery','📚'),('Bakery','🥐')] %}
+    <a class="category-card" href="{{ url_for('shops', city=city, category=c) }}"><span>{{ icon }}</span><b>{{ _(c) }}</b><small>{{ _("Explore local stores") }}</small></a>
+    {% endfor %}
+  </div>
+</section>
+<section class="section">
+  <div class="section-head"><div><div class="eyebrow">{{ _("IN YOUR NEIGHBOURHOOD") }}</div><h2>{{ _("Local shops in {city}", city=city) }}</h2></div><a href="{{ url_for('shops', city=city) }}">{{ _("View directory") }} ↗</a></div>
+  <div class="shop-grid">
+    {% for shop in shops[:6] %}<a class="shop-card" href="{{ url_for('shop_detail', shop_id=shop.id) }}">
+      <div class="shop-banner {{ loop.index0 % 5 }}"><span>{{ {'Groceries':'🥬','Furniture':'🛋️','Meat & Seafood':'🥩','Electronics':'🎧','Hardware':'🧰','Clothing':'👕'}.get(shop.category,'🏪') }}</span><em>{{ _(shop.category) }}</em></div>
+      <div class="shop-info"><h3>{{ shop.name }}</h3><p>{{ _("Owner") }}: {{ shop.owner_name }}</p><div class="shop-meta"><span>⌖ {{ shop.area }}</span><span>{{ shop.products|length }} {{ _("products") }}</span></div></div>
+    </a>{% else %}<div class="empty">{{ _("No shops found in {city} yet. Try another city or explore the directory.", city=city) }}</div>{% endfor %}
+  </div>
+</section>
+<section class="section product-section">
+  <div class="section-head"><div><div class="eyebrow">{{ _("GOOD THINGS, CLOSE BY") }}</div><h2>{{ _("Popular picks") }}</h2></div><a href="{{ url_for('ai_search', city=city) }}">{{ _("Find something") }} ↗</a></div>
+  <div class="product-grid">{% for p in products %}<div class="product-card"><div class="product-emoji">{{ p.image_emoji }}</div><div class="product-body"><small>{{ p.shop.name }}</small><h3>{{ p.name }}</h3><p>{{ p.description }}</p><div class="product-bottom"><strong>{{ money(p.price, p.shop.currency) }}</strong><form method="post" action="{{ url_for('cart_add', product_id=p.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn small">{{ _("Add +") }}</button></form></div></div></div>{% endfor %}</div>
+</section>
+{% endblock %}

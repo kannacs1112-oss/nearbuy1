@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block title %}{{ _("Register shop") }}{% endblock %}{% block content %}
+<div class="page-heading"><div class="eyebrow">{{ _("LOCAL BUSINESS PARTNER") }}</div><h1>{{ _("Register your") }} <span>{{ _("shop") }}</span></h1><p>{{ _("Share accurate business details. Your listing appears after admin approval.") }}</p>{% if shop and shop.products %}<div class="notice">{{ _("Country and currency are locked because this shop already has products or orders.") }}</div>{% endif %}</div>
+<form method="post" class="panel form-grid"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label>{{ _("Shop name") }}<input name="name" required value="{{ shop.name if shop else '' }}"></label>
+<label>{{ _("Category") }}<select name="category">{% for c in categories %}<option value="{{ c }}" {% if shop and shop.category==c %}selected{% endif %}>{{ _(c) }}</option>{% endfor %}</select></label>
+<label>{{ _("Country") }}<select name="country" {% if shop and shop.products %}disabled{% endif %}>{% for code, info in countries.items() %}<option value="{{ code }}" {% if (shop.country if shop else 'IN')==code %}selected{% endif %}>{{ country_name(code) }} ({{ info.currency }})</option>{% endfor %}</select></label>
+<label>{{ _("City") }}<input name="city" required value="{{ shop.city if shop else '' }}" placeholder="{{ _('e.g. Madurai, Lyon, Austin') }}"></label>
+<label>{{ _("Area / neighbourhood") }}<input name="area" value="{{ shop.area if shop else '' }}"></label>
+<label>{{ _("Contact phone") }}<input name="phone" placeholder="{{ _('Include country code, e.g. +91') }}" value="{{ shop.phone if shop else current_user.phone }}"></label>
+<label>{{ _("Address") }}<input name="address" value="{{ shop.address if shop else '' }}"></label>
+<label class="span-two">{{ _("Description") }}<textarea name="description" rows="3">{{ shop.description if shop else '' }}</textarea></label>
+<div class="span-two"><button class="btn primary">{{ _("Submit shop for approval") }}</button></div></form>
+{% endblock %}

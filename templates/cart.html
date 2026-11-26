@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% block title %}{{ _("Your cart") }}{% endblock %}{% block content %}
+<div class="page-heading"><div class="eyebrow">{{ _("YOUR LOCAL FINDS") }}</div><h1>{{ _("Shopping") }} <span>{{ _("cart") }}</span></h1></div>
+{% if items %}<form method="post" action="{{ url_for('cart_update') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><div class="cart-layout"><div class="panel">{% for item in items %}<div class="cart-row"><div class="product-emoji compact">{{ item.product.image_emoji }}</div><div class="cart-product"><b>{{ item.product.name }}</b><small>{{ item.product.shop.name }} · {{ money(item.product.price, item.product.shop.currency) }}</small></div><input class="qty" type="number" min="0" max="{{ item.product.stock }}" name="{{ item.product.id }}" value="{{ item.qty }}"><strong>{{ money(item.line, item.product.shop.currency) }}</strong></div>{% endfor %}<button class="btn secondary">{{ _("Update cart") }}</button></div><aside class="panel summary"><h3>{{ _("Order summary") }}</h3>
+{% if shop_count > 1 %}<div class="notice">{{ _("Your cart has items from more than one shop. Checkout works one shop at a time, so remove items to keep a single shop.") }}</div>{% endif %}
+{% for currency, amount in totals.items() %}<div class="summary-line total"><span>{{ _("Total") }} ({{ currency }})</span><b>{{ money(amount, currency) }}</b></div>{% endfor %}
+<hr>
+<div class="summary-line"><span>{{ _("Delivery") }}</span><span>{{ _("Calculated later") }}</span></div>
+<a class="btn primary full" href="{{ url_for('checkout') }}">{{ _("Continue to checkout") }}</a><small>{{ _("Demo checkout · Payment is simulated") }}</small></aside></div></form>
+{% else %}<div class="empty large-empty"><span>🛍️</span><h2>{{ _("Your cart is waiting") }}</h2><p>{{ _("Explore local shops and add something you love.") }}</p><a class="btn primary" href="{{ url_for('shops') }}">{{ _("Explore shops") }}</a></div>{% endif %}
+{% endblock %}

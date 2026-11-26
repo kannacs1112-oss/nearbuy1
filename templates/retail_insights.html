@@ -1,0 +1,22 @@
+{% extends "base.html" %}{% block title %}{{ _("Retail intelligence") }}{% endblock %}{% block content %}
+<div class="dashboard-head"><div><div class="eyebrow">{{ _("NEARBUY RETAIL INTELLIGENCE") }}</div><h1>{{ _("Know what to restock.") }}</h1><p>{{ _("Practical inventory signals based on your recorded orders from the last 30 days.") }}</p></div><a class="btn" href="{{ url_for('manage_shop') }}">← {{ _("Back to shop") }}</a></div>
+<div class="metric-grid">
+  <div class="metric"><small>{{ _("Units sold · 30 days") }}</small><strong>{{ total_units }}</strong></div>
+  <div class="metric"><small>{{ _("Sales value · 30 days") }}</small><strong>{{ money(total_revenue, shop.currency) }}</strong></div>
+  <div class="metric"><small>{{ _("Items needing attention") }}</small><strong>{{ low_stock }}</strong></div>
+  <div class="metric"><small>{{ _("Active products") }}</small><strong>{{ insights|length }}</strong></div>
+</div>
+<section class="panel section">
+  <div class="section-head"><div><div class="eyebrow">{{ _("INVENTORY ACTIONS") }}</div><h2>{{ _("Stock health & reorder suggestions") }}</h2></div><span class="status">{{ _("30-day order history") }}</span></div>
+  <p class="muted">{{ _("Suggestions are calculated from observed sales velocity. They are decision support, not guaranteed forecasts. New products without sales history are marked accordingly.") }}</p>
+  {% for row in insights %}
+  <div class="order-row insight-row">
+    <div class="insight-main"><b>{{ row.product.image_emoji }} {{ row.product.name }}</b><small>{{ _("{n} units sold", n=row.sold) }} · {{ _("{amount} sales value", amount=money(row.revenue, shop.currency)) }} · {{ _("Current stock:") }} {{ row.product.stock }} {{ _(row.product.unit) }}</small><small>{% if row.cover is not none %}{{ _("About {days} days of stock remain at the recent pace", days='%.1f'|format(row.cover)) }}{% else %}{{ _("Not enough sales history to estimate stock cover") }}{% endif %}</small></div>
+    <div class="order-right"><span class="insight-pill {{ row.level }}">{{ _(row.label) }}</span>{% if row.restock > 0 %}<strong>{{ _("Suggested reorder: {n}", n=row.restock) }}</strong>{% endif %}
+      <form method="post" action="{{ url_for('update_product_stock', product_id=row.product.id) }}" class="stock-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>{{ _("Update stock") }} <input type="number" name="stock" min="0" max="1000000" value="{{ row.product.stock }}" required></label><button class="btn small">{{ _("Save") }}</button></form>
+    </div>
+  </div>
+  {% else %}<div class="empty">{{ _("Add products to your approved shop to see inventory insights.") }}</div>{% endfor %}
+</section>
+<section class="panel section"><h2>{{ _("How these insights work") }}</h2><div class="insight-explain"><div><b>{{ _("Sales velocity") }}</b><p>{{ _("Units in non-cancelled orders over the last 30 days, divided by 30.") }}</p></div><div><b>{{ _("Stock cover") }}</b><p>{{ _("Current stock divided by average daily units sold. Shown only when sales exist.") }}</p></div><div><b>{{ _("Suggested reorder") }}</b><p>{{ _("Estimated quantity needed to reach 14 days of cover, minus current stock.") }}</p></div></div></section>
+{% endblock %}
