@@ -1,0 +1,10 @@
+/* Language switcher and script-aware typography (added in v3.0.0) */
+.lang-switch{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:14px 0}
+.lang-switch a{border:1px solid var(--line);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--muted)}
+.lang-switch a:hover{color:white}
+.lang-switch a.active{border-color:#8e68e8;color:white;background:#2a2140}
+html:lang(hi) body,html:lang(ta) body{line-height:1.75}
+html:lang(hi),html:lang(hi) *{font-family:'Noto Sans Devanagari',var(--font)!important}
+html:lang(ta),html:lang(ta) *{font-family:'Noto Sans Tamil',var(--font)!important}
+html:lang(hi) h1,html:lang(ta) h1,html:lang(hi) h2,html:lang(ta) h2{letter-spacing:0!important}
+.summary-line.total b,.summary-line.total span{white-space:nowrap}
